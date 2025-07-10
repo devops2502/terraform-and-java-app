@@ -142,3 +142,4 @@ module "s3_bucket" {
     Name = "${local.prefix_name}-s3-bucket"
   })
 }
+
