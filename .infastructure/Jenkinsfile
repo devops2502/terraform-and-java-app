@@ -1,53 +1,76 @@
 pipeline {
-    agent { label 'AGENT-01' }
-    environment {
-      AWS_DEFAULT_REGION = 'eu-west-1'
-      AWS_CREDS = credentials('aws-creds')
-    }
-    tools {
-      terraform 'terraform1.12-linux'
-    }
-    stages {
-      stage('Checkout Code') {
-        steps {
-          checkout scm
-        }
-      }
-      stage('Terraform Init') {
-        steps {
-          dir('.infrastructure') {
-            sh 'terraform init -input=false'
-          }
-        }
-      }
-      stage('Terraform Fomat and Validate') {
-        steps {
-          dir('.infrastructure') {
-            sh 'terraform fmt'
-            sh 'terraform validate -no-color'
-          }
-        }
-      } 
-      stage('Terraform Plan') {
-          steps {
-            dir('.infrastructure') {
-              sh 'terraform plan -no-color -input=false'
-            }
-          }
-      }
-      stage('Manual Approval') {
-        steps {
-          timeout(time: 1, unit: 'HOURS') {
-            input message: 'Apply changes?'
-          }
-        }
-      }
-      stage('Terraform Apply') {
-          steps {
-            dir('.infrastructure') {
-              sh 'terraform apply --auto-approve'
-            }
-          }
+  agent { label 'AGENT-01' }
+
+  environment {
+    AWS_DEFAULT_REGION = 'eu-west-1'
+    AWS_CREDS = credentials('aws-creds')
+  }
+
+  tools {
+    terraform 'terraform1.12-linux'
+  }
+
+  stages {
+    stage('Checkout Code') {
+      steps {
+        checkout scm
       }
     }
+
+    stage('Terraform Init') {
+      when {
+        changeset "**/.infrastructure/**"
+      }
+      steps {
+        dir('.infrastructure') {
+          sh 'terraform init -input=false'
+        }
+      }
+    }
+
+    stage('Terraform Format and Validate') {
+      when {
+        changeset "**/.infrastructure/**"
+      }
+      steps {
+        dir('.infrastructure') {
+          sh 'terraform fmt'
+          sh 'terraform validate -no-color'
+        }
+      }
+    }
+
+    stage('Terraform Plan') {
+      when {
+        changeset "**/.infrastructure/**"
+      }
+      steps {
+        dir('.infrastructure') {
+          sh 'terraform plan -no-color -input=false'
+        }
+      }
+    }
+
+    stage('Manual Approval') {
+      when {
+        changeset "**/.infrastructure/**"
+      }
+      steps {
+        timeout(time: 1, unit: 'HOURS') {
+          input message: 'Apply changes?'
+        }
+      }
+    }
+
+    stage('Terraform Apply') {
+      when {
+        changeset "**/.infrastructure/**"
+      }
+      steps {
+        dir('.infrastructure') {
+          sh 'terraform apply --auto-approve'
+        }
+      }
+    }
+  }
 }
