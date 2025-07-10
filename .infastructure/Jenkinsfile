@@ -3,7 +3,6 @@ pipeline {
 
   environment {
     AWS_DEFAULT_REGION = 'eu-west-1'
-    AWS_CREDS = credentials('aws-creds')
   }
 
   tools {
@@ -23,11 +22,15 @@ pipeline {
       }
       steps {
         dir('.infastructure') {
-          sh '''
-            export AWS_ACCESS_KEY_ID=$AWS_CREDS_USR
-            export AWS_SECRET_ACCESS_KEY=$AWS_CREDS_PSW
-            terraform init -input=false
-          '''
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'aws-creds',
+              usernameVariable: 'AWS_ACCESS_KEY_ID',
+              passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+            )
+          ]) {
+            sh 'terraform init -input=false'
+          }
         }
       }
     }
@@ -50,7 +53,15 @@ pipeline {
       }
       steps {
         dir('.infastructure') {
-          sh 'terraform plan -no-color -input=false'
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'aws-creds',
+              usernameVariable: 'AWS_ACCESS_KEY_ID',
+              passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+            )
+          ]) {
+            sh 'terraform plan -no-color -input=false'
+          }
         }
       }
     }
@@ -72,7 +83,15 @@ pipeline {
       }
       steps {
         dir('.infastructure') {
-          sh 'terraform apply --auto-approve'
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'aws-creds',
+              usernameVariable: 'AWS_ACCESS_KEY_ID',
+              passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+            )
+          ]) {
+            sh 'terraform apply --auto-approve'
+          }
         }
       }
     }
