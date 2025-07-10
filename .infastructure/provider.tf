@@ -14,3 +14,12 @@
 #   profile = "default"
 #   region  = "eu-west-1"
 # }
+
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-state"
+    key            = "terraform.tfstate"
+    region         = "eu-west-1"
+    # dynamodb_table = "terraform-lock"
+  }
+}
