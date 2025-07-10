@@ -119,26 +119,26 @@ module "ec2_jenkins_agent" {
   })
 }
 
-# module "s3_bucket" {
-#   source = "./modules/s3_bucket"
+module "s3_bucket" {
+  source = "./modules/s3_bucket"
 
-#   bucket        = var.bucket
-#   acl           = var.acl
-#   force_destroy = var.force_destroy
+  bucket        = var.bucket
+  acl           = var.acl
+  force_destroy = var.force_destroy
 
-#   control_object_ownership = var.control_object_ownership
-#   object_ownership         = var.object_ownership
+  control_object_ownership = var.control_object_ownership
+  object_ownership         = var.object_ownership
 
-#   versioning = var.versioning
+  versioning = var.versioning
 
-#   block_public_acls       = var.block_public_acls
-#   block_public_policy     = var.block_public_policy
-#   ignore_public_acls      = var.ignore_public_acls
-#   restrict_public_buckets = var.restrict_public_buckets
+  block_public_acls       = var.block_public_acls
+  block_public_policy     = var.block_public_policy
+  ignore_public_acls      = var.ignore_public_acls
+  restrict_public_buckets = var.restrict_public_buckets
 
-#   lifecycle_rule_s3 = var.lifecycle_rule_s3
+  lifecycle_rule_s3 = var.lifecycle_rule_s3
 
-#   tags = merge(local.tags, {
-#     Name = "${local.prefix_name}-s3-bucket"
-#   })
-# }
+  tags = merge(local.tags, {
+    Name = "${local.prefix_name}-s3-bucket"
+  })
+}
