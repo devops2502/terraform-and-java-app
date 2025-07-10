@@ -1,23 +1,35 @@
 pipeline {
   agent { label 'AGENT-01' }
-  when {
-    allOf {
-      branch 'main'
-      changeset "**/src/**"
-    }
-  }
+
   stages {
     stage('Checkout Code') {
+      when {
+        branch 'main'
+      }
       steps {
         checkout scm
       }
     }
+
     stage('Build') {
+      when {
+        allOf {
+          branch 'main'
+          changeset "**/src/**"
+        }
+      }
       steps {
         sh './mvnw -B -DskipTests clean package'
       }
     }
+
     stage('Test') {
+      when {
+        allOf {
+          branch 'main'
+          changeset "**/src/**"
+        }
+      }
       steps {
         sh './mvnw test'
       }
