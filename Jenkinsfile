@@ -3,9 +3,6 @@ pipeline {
 
   stages {
     stage('Checkout Code') {
-      when {
-        branch 'main'
-      }
       steps {
         checkout scm
       }
@@ -14,7 +11,6 @@ pipeline {
     stage('Build') {
       when {
         allOf {
-          branch 'main'
           changeset "**/src/**"
         }
       }
@@ -26,7 +22,6 @@ pipeline {
     stage('Test') {
       when {
         allOf {
-          branch 'main'
           changeset "**/src/**"
         }
       }
