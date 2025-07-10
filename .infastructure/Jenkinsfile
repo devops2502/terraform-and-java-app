@@ -7,6 +7,11 @@ pipeline {
     tools {
       terraform 'terraform1.12-linux'
     }
+    when {
+      allOf {
+        changeset "**/src/**"
+      }
+    }
     stages {
       stage('Checkout Code') {
         steps {

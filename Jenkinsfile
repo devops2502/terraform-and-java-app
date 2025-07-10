@@ -1,6 +1,11 @@
 pipeline {
   agent { label 'AGENT-01' }
-  when { branch 'main' }
+  when {
+    allOf {
+      branch 'main'
+      changeset "**/src/**"
+    }
+  }
   stages {
     stage('Checkout Code') {
       steps {
