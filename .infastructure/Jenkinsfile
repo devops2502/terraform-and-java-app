@@ -19,10 +19,10 @@ pipeline {
 
     stage('Terraform Init') {
       when {
-        changeset "**/.infrastructure/**"
+        changeset "*/.infastructure/*"
       }
       steps {
-        dir('.infrastructure') {
+        dir('.infastructure') {
           sh 'terraform init -input=false'
         }
       }
@@ -30,10 +30,10 @@ pipeline {
 
     stage('Terraform Format and Validate') {
       when {
-        changeset "**/.infrastructure/**"
+        changeset "*/.infastructure/*"
       }
       steps {
-        dir('.infrastructure') {
+        dir('.infastructure') {
           sh 'terraform fmt'
           sh 'terraform validate -no-color'
         }
@@ -42,10 +42,10 @@ pipeline {
 
     stage('Terraform Plan') {
       when {
-        changeset "**/.infrastructure/**"
+        changeset "*/.infastructure/*"
       }
       steps {
-        dir('.infrastructure') {
+        dir('.infastructure') {
           sh 'terraform plan -no-color -input=false'
         }
       }
@@ -53,7 +53,7 @@ pipeline {
 
     stage('Manual Approval') {
       when {
-        changeset "**/.infrastructure/**"
+        changeset "*/.infastructure/*"
       }
       steps {
         timeout(time: 1, unit: 'HOURS') {
@@ -64,10 +64,10 @@ pipeline {
 
     stage('Terraform Apply') {
       when {
-        changeset "**/.infrastructure/**"
+        changeset "*/.infastructure/*"
       }
       steps {
-        dir('.infrastructure') {
+        dir('.infastructure') {
           sh 'terraform apply --auto-approve'
         }
       }
