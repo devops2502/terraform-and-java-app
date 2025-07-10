@@ -36,5 +36,4 @@ build/
 .terraform
 *.tfstate
 *.tfstate.*
-*.tfvars
 /key_private
