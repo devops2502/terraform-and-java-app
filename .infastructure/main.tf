@@ -139,7 +139,7 @@ module "s3_bucket" {
   lifecycle_rule_s3 = var.lifecycle_rule_s3
 
   tags = merge(local.tags, {
-    Name = "${local.prefix_name}-s3-bucket"
+    Name = "${local.prefix_name}-my-s3-bucket"
   })
 }
 

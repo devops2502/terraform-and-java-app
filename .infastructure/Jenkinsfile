@@ -19,7 +19,7 @@ pipeline {
 
     stage('Terraform Init') {
       when {
-        changeset "*/.infastructure/*"
+        changeset "**/.infastructure/**"
       }
       steps {
         dir('.infastructure') {
@@ -30,7 +30,7 @@ pipeline {
 
     stage('Terraform Format and Validate') {
       when {
-        changeset "*/.infastructure/*"
+        changeset "**/.infastructure/**"
       }
       steps {
         dir('.infastructure') {
@@ -42,7 +42,7 @@ pipeline {
 
     stage('Terraform Plan') {
       when {
-        changeset "*/.infastructure/*"
+        changeset "**/.infastructure/**"
       }
       steps {
         dir('.infastructure') {
@@ -53,7 +53,7 @@ pipeline {
 
     stage('Manual Approval') {
       when {
-        changeset "*/.infastructure/*"
+        changeset "**/.infastructure/**"
       }
       steps {
         timeout(time: 1, unit: 'HOURS') {
@@ -64,7 +64,7 @@ pipeline {
 
     stage('Terraform Apply') {
       when {
-        changeset "*/.infastructure/*"
+        changeset "**/.infastructure/**"
       }
       steps {
         dir('.infastructure') {
