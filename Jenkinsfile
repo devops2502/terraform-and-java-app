@@ -8,6 +8,25 @@ pipeline {
       }
     }
 
+    stage('Validate PR rules') {
+      when {
+        changeRequest()
+      }
+      steps {
+        script {
+          if (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'main') {
+            error "Không được phép merge feature/* vào main"
+          }
+          if (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'staging') {
+            error "Không được phép merge feature/* vào staging"
+          }
+          if (env.CHANGE_BRANCH ==~ 'develop' && env.CHANGE_TARGET == 'main') {
+            error "Không được phép merge develop vào main"
+          }
+        }
+      }
+    }
+
     stage('Build') {
       when {
         anyOf {
