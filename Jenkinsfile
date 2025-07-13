@@ -30,7 +30,7 @@ pipeline {
     stage('Build') {
       when {
         anyOf {
-          allOf {
+          anyOf {
             changeRequest()
             expression { return env.CHANGE_BRANCH ==~ /^feature\/.*/ || env.CHANGE_BRANCH ==~ /^hotfix\/.*/}
             anyOf {
