@@ -255,3 +255,5 @@ variable "lifecycle_rule_s3" {
     }))
   }))
 }
+
+

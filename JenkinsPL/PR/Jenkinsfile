@@ -1,30 +1,31 @@
 pipeline {
   agent { label 'AGENT-01' }
+  when {
+    // Khi có PR, PR từ nhánh feature, thay đổi trong src hoặc pom.xml
+    allOf {
+      changeRequest()
+      expression { return env.CHANGE_BRANCH ==~ /^feature\/.*/ }
+      anyOf {
+        changeset "**/src/**"
+        changeset "**/pom.xml"
+      }
+    }
+  }
 
   stages {
-    stage('Checkout Code') {
+    stage('Checkout') {
       steps {
         checkout scm
       }
     }
 
     stage('Build') {
-      when {
-        allOf {
-          changeset "**/src/**"
-        }
-      }
       steps {
         sh './mvnw -B -DskipTests clean package'
       }
     }
 
     stage('Test') {
-      when {
-        allOf {
-          changeset "**/src/**"
-        }
-      }
       steps {
         sh './mvnw test'
       }
