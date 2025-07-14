@@ -40,7 +40,9 @@ pipeline {
           // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên)
           allOf {
             changeRequest()
-            expression { return env.CHANGE_BRANCH ==~ /^feature\/.*/ }
+            expression {
+              return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET)
+            }
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
