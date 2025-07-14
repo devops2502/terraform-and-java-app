@@ -46,7 +46,6 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
-              not { changelog '' }  // fallback nếu changelog trống
             }
           }
         }
@@ -71,7 +70,6 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
-              not { changelog '' }  // fallback nếu changelog trống
             }
           }
         }
