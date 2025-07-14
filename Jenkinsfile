@@ -34,15 +34,19 @@ pipeline {
     stage('Build') {
       when {
         anyOf {
+          // Build cho nhánh chính
+          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
+
+          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên)
           allOf {
             changeRequest()
             expression { return env.CHANGE_BRANCH ==~ /^feature\/.*/ }
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
+              not { changelog '' }  // fallback nếu changelog trống
             }
           }
-          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME)}
         }
       }
       steps {
@@ -53,15 +57,19 @@ pipeline {
     stage('Test') {
       when {
         anyOf {
+          // Build cho nhánh chính
+          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
+
+          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên)
           allOf {
             changeRequest()
             expression { return env.CHANGE_BRANCH ==~ /^feature\/.*/ }
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
+              not { changelog '' }  // fallback nếu changelog trống
             }
           }
-          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME)}
         }
       }
       steps {
