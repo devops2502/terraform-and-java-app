@@ -46,13 +46,8 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
+              changelog ''
             }
-          }
-          // 3. Fallback: là PR nhưng changelog rỗng (lần đầu)
-          allOf {
-            changeRequest()
-            expression { return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET) }
-            not { changelog '' }
           }
         }
       }
@@ -76,14 +71,8 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
+              changelog ''
             }
-          }
-
-          // 3. Fallback: là PR nhưng changelog rỗng (lần đầu)
-          allOf {
-            changeRequest()
-            expression { return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET) }
-            not { changelog '' }
           }
         }
       }
