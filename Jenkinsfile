@@ -46,7 +46,15 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
-              changelog ''
+              allOf {
+                not {
+                  anyOf {
+                    changeset "src/**"
+                    changeset "**/pom.xml"
+                  }
+                }
+                changelog ''
+              }
             }
           }
         }
@@ -71,7 +79,15 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
-              changelog ''
+              allOf {
+                not {
+                  anyOf {
+                    changeset "src/**"
+                    changeset "**/pom.xml"
+                  }
+                }
+                changelog ''
+              }
             }
           }
         }
