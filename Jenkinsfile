@@ -78,7 +78,6 @@ pipeline {
       }
       steps {
         sh './mvnw test'
-        echo "BRANCH_NAME: ${env.BRANCH_NAME}"
       }
       post {
         always {
@@ -91,6 +90,8 @@ pipeline {
       when {
         // not { changeRequest() }
         expression {
+          echo "DEBUG: changeRequest = ${changeRequest()}"
+          echo "BRANCH_NAME: ${env.BRANCH_NAME}"
           return !changeRequest() && ['develop', 'staging', 'main'].contains(env.BRANCH_NAME)
         }
       }
