@@ -95,6 +95,7 @@ pipeline {
       }
       steps {
         script {
+          echo "BRANCH_NAME: ${env.BRANCH_NAME}"
           def selectedEnv = input(
             id: 'DeployEnv', message: 'Chọn môi trường để deploy:',
             parameters: [
