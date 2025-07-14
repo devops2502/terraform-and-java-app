@@ -40,6 +40,11 @@ variable "ec2_user_data" {
   default     = null
 }
 
+variable "create_eip" {
+  description = "Determines whether a public EIP will be created and associated with the instance."
+  type = bool
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type = map(string)

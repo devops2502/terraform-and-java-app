@@ -185,6 +185,11 @@ variable "ec2_user_data" {
   default     = null
 }
 
+# variable "create_eip" {
+#   description = "Determines whether a public EIP will be created and associated with the instance."
+#   type = bool
+# }
+
 ### S3 bucket
 variable "bucket" {
   description = "Name of s3 bucket"

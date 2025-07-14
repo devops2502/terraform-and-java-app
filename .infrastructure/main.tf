@@ -96,6 +96,7 @@ module "ec2_jenkins_server" {
   ec2_monitoring         = var.ec2_monitoring
   vpc_security_group_ids = [module.sg.sg_id]
   subnet_id              = module.network.public_subnets[0]
+  create_eip             = true
   ec2_user_data          = file("${path.module}/tools/jenkins_install.sh")
 
   tags = merge(local.tags, {
@@ -113,6 +114,7 @@ module "ec2_jenkins_agent" {
   ec2_monitoring         = var.ec2_monitoring
   vpc_security_group_ids = [module.sg.sg_id]
   subnet_id              = module.network.public_subnets[1]
+  create_eip             = false
 
   tags = merge(local.tags, {
     Name = "${local.prefix_name}-ec2-jenkins-agent"
