@@ -2,12 +2,14 @@ pipeline {
   agent { label 'AGENT-01' }
 
   when {
-    allOf {
+    anyOf {
       changeRequest()
-      expression { return env.CHANGE_BRANCH ==~ /^feature\/.*/ }
-      anyOf {
-        changeset "src/**"
-        changeset "**/pom.xml"
+      allOf {
+        expression { return env.CHANGE_BRANCH ==~ /^feature\/.*/ }
+        anyOf {
+          changeset "src/**"
+          changeset "**/pom.xml"
+        }
       }
     }
   }
