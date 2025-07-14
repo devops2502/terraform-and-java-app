@@ -88,11 +88,11 @@ pipeline {
 
     stage('Deploy') {
       when {
-        // not { changeRequest() }
-        expression {
-          echo "DEBUG: changeRequest = ${changeRequest()}"
-          echo "BRANCH_NAME: ${env.BRANCH_NAME}"
-          return !changeRequest() && ['develop', 'staging', 'main'].contains(env.BRANCH_NAME)
+        allOf {
+          not { changeRequest() }
+          expression {
+            return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME)
+          }
         }
       }
       steps {
