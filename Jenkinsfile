@@ -97,35 +97,26 @@ pipeline {
       }
       steps {
         script {
-          def selectedEnv = input(
-            id: 'DeployEnv', message: 'Chọn môi trường để deploy:',
-            parameters: [
-              choice(name: 'ENV', choices: ['dev', 'staging', 'prod'], description: 'Chọn môi trường')
-            ]
-          )
-          echo "Đang deploy lên môi trường: ${selectedEnv.toUpperCase()}"
+          // def selectedEnv = input(
+          //   id: 'DeployEnv', message: 'Chọn môi trường để deploy:',
+          //   parameters: [
+          //     choice(name: 'ENV', choices: ['dev', 'staging', 'prod'], description: 'Chọn môi trường')
+          //   ]
+          // )
+          // echo "Đang deploy lên môi trường: ${selectedEnv.toUpperCase()}"
 
-          switch (selectedEnv) {
-            case 'dev':
-              if (env.BRANCH_NAME != 'develop') {
-                error "Không thể deploy DEV từ nhánh ${env.BRANCH_NAME}. Phải là develop."
-              }
+          switch (env.BRANCH_NAME) {
+            case 'develop':
               echo "Deploying to DEV"
               // sh './scripts/deploy-dev.sh'
               break
 
             case 'staging':
-              if (env.BRANCH_NAME != 'staging') {
-                error "Không thể deploy STAGING từ nhánh ${env.BRANCH_NAME}. Phải là staging."
-              }
               echo "Deploying to STAGING"
               // sh './scripts/deploy-staging.sh'
               break
 
-            case 'prod':
-              if (env.BRANCH_NAME != 'main') {
-                error "Không thể deploy PROD từ nhánh ${env.BRANCH_NAME}. Phải là main."
-              }
+            case 'main':
               input message: "Xác nhận deploy lên PROD?"
               echo "Deploying to PROD"
               // sh './scripts/deploy-prod.sh'
