@@ -35,24 +35,11 @@ pipeline {
     }
   }
 
-    stage('Build') {
-      when {
-        anyOf {
-          allOf {
-            changeRequest()
-            expression { return env.CHANGE_BRANCH ==~ /^feature\/.*/ || env.CHANGE_BRANCH ==~ /^hotfix\/.*/}
-            anyOf {
-              changeset "src/**"
-              changeset "**/pom.xml"
-            }
-          }
-          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME)}
-        }
-      }
-      steps {
-        sh './mvnw -B -DskipTests clean package'
-      }
+  stage('Build') {
+    steps {
+      sh './mvnw -B -DskipTests clean package'
     }
+  }
 
   stage('Test') {
     steps {
