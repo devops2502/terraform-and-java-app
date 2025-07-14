@@ -43,6 +43,7 @@ pipeline {
             }
           }
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME)}
+          not { changelog '' }
         }
       }
       steps {
@@ -62,6 +63,7 @@ pipeline {
             }
           }
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME)}
+          not { changelog '' }
         }
       }
       steps {
