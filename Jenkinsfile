@@ -36,6 +36,8 @@ pipeline {
         anyOf {
           // Build cho nhánh chính
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
+          // Build cho nhánh feature
+          expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
 
           // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
           allOf {
@@ -70,6 +72,8 @@ pipeline {
         anyOf {
           // Build cho nhánh chính
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
+          // Build cho nhánh feature
+          expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
 
           // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
           allOf {
@@ -135,7 +139,9 @@ pipeline {
               break
 
             case 'main':
-              input message: "Xác nhận deploy lên PROD?"
+              timeout(time: 1, unit: 'HOURS') {
+                input message: "Xác nhận deploy lên PROD?"
+              }
               echo "Deploying to PROD"
               // sh './scripts/deploy-prod.sh'
               break

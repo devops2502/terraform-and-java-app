@@ -154,5 +154,32 @@ pipeline {
         }
       }
     }
+
+    stage('Terraform Destroy') {
+      when {
+        allOf {
+          not { changeRequest() }
+          expression {
+            env.BRANCH_NAME == 'main'
+          }
+        }
+      }
+      steps {
+        dir('.infrastructure') {
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'aws-creds',
+              usernameVariable: 'AWS_ACCESS_KEY_ID',
+              passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+            )
+          ]) {
+            timeout(time: 1, unit: 'HOURS') {
+              input message: "Xác nhận destroy IaC?"
+            }
+            sh 'terraform destroy --auto-approve'
+          }
+        }
+      }
+    }
   }
 }
