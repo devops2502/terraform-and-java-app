@@ -59,7 +59,7 @@ pipeline {
               // build lần đầu một PR 
               allOf {
                 not { changeset ".infrastructure/**" }
-                changelog ''
+                expression { currentBuild.changeSets.size() == 0 }
               }
             }
           }
@@ -106,7 +106,7 @@ pipeline {
               // build lần đầu một PR
               allOf {
                 not { changeset ".infrastructure/**" }
-                changelog ''
+                expression { currentBuild.changeSets.size() == 0 }
               }
             }
           }
