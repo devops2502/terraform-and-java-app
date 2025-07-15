@@ -1,99 +1,155 @@
-// pipeline {
-//   agent { label 'AGENT-01' }
+pipeline {
+  agent { label 'AGENT-01' }
 
-//   environment {
-//     AWS_DEFAULT_REGION = 'eu-west-1'
-//   }
+  environment {
+    AWS_DEFAULT_REGION = 'eu-west-1'
+  }
 
-//   tools {
-//     terraform 'terraform1.12-linux'
-//   }
+  tools {
+    terraform 'terraform1.12-linux'
+  }
 
-//   stages {
-//     stage('Checkout Code') {
-//       steps {
-//         checkout scm
-//       }
-//     }
+  stages {
+    stage('Checkout Code') {
+      steps {
+        checkout scm
+      }
+    }
 
-//     stage('Terraform Init') {
-//       when {
-//         changeset ".infrastructure/**"
-//       }
-//       steps {
-//         dir('.infrastructure') {
-//           withCredentials([
-//             usernamePassword(
-//               credentialsId: 'aws-creds',
-//               usernameVariable: 'AWS_ACCESS_KEY_ID',
-//               passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-//             )
-//           ]) {
-//             sh 'terraform init -input=false'
-//           }
-//         }
-//       }
-//     }
+    stage('Terraform Init') {
+      when {
+        anyOf {
+          // Build cho nhánh chính
+          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
 
-//     stage('Terraform Format and Validate') {
-//       when {
-//         changeset ".infrastructure/**"
-//       }
-//       steps {
-//         dir('.infrastructure') {
-//           sh 'terraform fmt'
-//           sh 'terraform validate -no-color'
-//         }
-//       }
-//     }
+          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
+          allOf {
+            changeRequest()
+            expression {
+              return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET)
+            }
+            anyOf {
+              changeset ".infrastructure/**"
+              // build lần đầu một PR
+              allOf {
+                not {
+                  anyOf {
+                    changeset ".infrastructure/**"
+                  }
+                }
+                changelog ''
+              }
+            }
+          }
+        }
+      }
+      steps {
+        dir('.infrastructure') {
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'aws-creds',
+              usernameVariable: 'AWS_ACCESS_KEY_ID',
+              passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+            )
+          ]) {
+            sh 'terraform init -input=false'
+          }
+        }
+      }
+    }
 
-//     stage('Terraform Plan') {
-//       when {
-//         changeset ".infrastructure/**"
-//       }
-//       steps {
-//         dir('.infrastructure') {
-//           withCredentials([
-//             usernamePassword(
-//               credentialsId: 'aws-creds',
-//               usernameVariable: 'AWS_ACCESS_KEY_ID',
-//               passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-//             )
-//           ]) {
-//             sh 'terraform plan -no-color -input=false'
-//           }
-//         }
-//       }
-//     }
+    stage('Terraform Format and Validate') {
+      when {
+        changeset ".infrastructure/**"
+      }
+      steps {
+        dir('.infrastructure') {
+          sh 'terraform fmt'
+          sh 'terraform validate -no-color'
+        }
+      }
+    }
 
-//     stage('Manual Approval') {
-//       when {
-//         changeset ".infrastructure/**"
-//       }
-//       steps {
-//         timeout(time: 1, unit: 'HOURS') {
-//           input message: 'Apply changes?'
-//         }
-//       }
-//     }
+    stage('Terraform Plan') {
+      when {
+        anyOf {
+          // Build cho nhánh chính
+          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
 
-//     stage('Terraform Apply') {
-//       when {
-//         changeset ".infrastructure/**"
-//       }
-//       steps {
-//         dir('.infrastructure') {
-//           withCredentials([
-//             usernamePassword(
-//               credentialsId: 'aws-creds',
-//               usernameVariable: 'AWS_ACCESS_KEY_ID',
-//               passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-//             )
-//           ]) {
-//             sh 'terraform apply --auto-approve'
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
+          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
+          allOf {
+            changeRequest()
+            expression {
+              return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET)
+            }
+            anyOf {
+              changeset ".infrastructure/**"
+              // build lần đầu một PR
+              allOf {
+                not {
+                  anyOf {
+                    changeset ".infrastructure/**"
+                  }
+                }
+                changelog ''
+              }
+            }
+          }
+        }
+      }
+      steps {
+        dir('.infrastructure') {
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'aws-creds',
+              usernameVariable: 'AWS_ACCESS_KEY_ID',
+              passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+            )
+          ]) {
+            sh 'terraform plan -no-color -input=false'
+          }
+        }
+      }
+    }
+
+    stage('Manual Approval') {
+      when {
+        allOf {
+          not { changeRequest() }
+          expression {
+            env.BRANCH_NAME == 'main'
+          }
+        }
+      }
+      steps {
+        timeout(time: 1, unit: 'HOURS') {
+          input message: 'Apply changes?'
+        }
+      }
+    }
+
+    stage('Terraform Apply') {
+      when {
+        allOf {
+          not { changeRequest() }
+          expression {
+            env.BRANCH_NAME == 'main'
+          }
+        }
+      }
+      steps {
+        dir('.infrastructure') {
+          withCredentials([
+            usernamePassword(
+              credentialsId: 'aws-creds',
+              usernameVariable: 'AWS_ACCESS_KEY_ID',
+              passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+            )
+          ]) {
+            sh 'terraform apply --auto-approve'
+          }
+        }
+      }
+    }
+  }
+}

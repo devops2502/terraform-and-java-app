@@ -37,7 +37,7 @@ pipeline {
           // Build cho nhánh chính
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
 
-          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên)
+          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
           allOf {
             changeRequest()
             expression {
@@ -46,6 +46,7 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
+              // build lần đầu một PR
               allOf {
                 not {
                   anyOf {
@@ -70,7 +71,7 @@ pipeline {
           // Build cho nhánh chính
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
 
-          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên)
+          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
           allOf {
             changeRequest()
             expression {
@@ -79,6 +80,7 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
+              // build lần đầu một PR
               allOf {
                 not {
                   anyOf {
@@ -146,3 +148,5 @@ pipeline {
     }
   }
 }
+
+// changeset trong Jenkins chỉ gồm những thay đổi từ lúc PR mở trở đi
