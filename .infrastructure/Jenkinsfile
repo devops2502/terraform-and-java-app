@@ -60,6 +60,28 @@ pipeline {
       }
     }
 
+    stage('DEBUG Changeset') {
+  steps {
+    script {
+      def filesChanged = []
+      for (cs in currentBuild.changeSets) {
+        for (entry in cs.items) {
+          for (file in entry.affectedFiles) {
+            filesChanged << file.path
+          }
+        }
+      }
+
+      if (filesChanged.isEmpty()) {
+        echo "❌ No changes detected by Jenkins 'changeset'"
+      } else {
+        echo "✅ Changed files: ${filesChanged.join(', ')}"
+      }
+    }
+  }
+}
+
+
     stage('Terraform Format and Validate') {
       when {
         changeset ".infrastructure/**"
