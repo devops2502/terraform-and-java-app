@@ -81,9 +81,6 @@ pipeline {
     }
 
     stage('Terraform Format and Validate') {
-      when {
-        changeset ".infrastructure/**"
-      }
       steps {
         dir('.infrastructure') {
           sh 'terraform fmt'
