@@ -92,7 +92,6 @@ pipeline {
     stage('Terraform Plan') {
       when {
         anyOf {
-          // Build cho nhánh chính
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
           expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
 
