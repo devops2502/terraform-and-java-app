@@ -73,7 +73,10 @@ pipeline {
           // Build cho nhánh chính
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
           // Build cho nhánh feature
-          expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
+          allOf {
+            changeRequest()
+            expression { env.CHANGE_BRANCH ==~ /^feature\/.*/ }
+          }
 
           // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
           allOf {
