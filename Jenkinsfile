@@ -181,3 +181,4 @@ pipeline {
 
 // changeset trong Jenkins chỉ gồm những thay đổi từ lúc PR mở trở đi
 // changeset chỉ có tác dụng bên trong 1 stage ko có tác dụng kiểm soát trigger pipeline
+// sử dụng path filtering trong Jenkins UI để ngăn chặn trigger cả pipeline
