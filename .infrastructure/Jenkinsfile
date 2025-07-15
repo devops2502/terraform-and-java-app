@@ -6,7 +6,7 @@ pipeline {
   }
 
   tools {
-    terraform 'terraform1.12-linux'
+    terraform 'terraform'
   }
 
   stages {
