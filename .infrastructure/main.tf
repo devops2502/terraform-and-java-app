@@ -121,7 +121,7 @@ module "ec2_jenkins_agent" {
   })
 }
 
-module "test" {
+module "test_1" {
   source = "./modules/ec2"
 
   ec2_name               = "test"

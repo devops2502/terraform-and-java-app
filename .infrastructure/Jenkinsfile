@@ -6,7 +6,7 @@ pipeline {
   }
 
   tools {
-    terraform 'terraform1.12-linux'
+    terraform 'terraform50708'
   }
 
   stages {
@@ -56,10 +56,10 @@ pipeline {
             }
             anyOf {
               changeset ".infrastructure/**"
-              // build lần đầu một PR
+              // build lần đầu một PR 
               allOf {
                 not { changeset ".infrastructure/**" }
-                changelog ''
+                expression { currentBuild.changeSets.size() == 0 }
               }
             }
           }
@@ -81,9 +81,6 @@ pipeline {
     }
 
     stage('Terraform Format and Validate') {
-      when {
-        changeset ".infrastructure/**"
-      }
       steps {
         dir('.infrastructure') {
           sh 'terraform fmt'
@@ -95,7 +92,6 @@ pipeline {
     stage('Terraform Plan') {
       when {
         anyOf {
-          // Build cho nhánh chính
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
           expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
 
@@ -110,7 +106,7 @@ pipeline {
               // build lần đầu một PR
               allOf {
                 not { changeset ".infrastructure/**" }
-                changelog ''
+                expression { currentBuild.changeSets.size() == 0 }
               }
             }
           }
