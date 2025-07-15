@@ -58,11 +58,7 @@ pipeline {
               changeset ".infrastructure/**"
               // build lần đầu một PR
               allOf {
-                not {
-                  anyOf {
-                    changeset ".infrastructure/**"
-                  }
-                }
+                not { changeset ".infrastructure/**" }
                 changelog ''
               }
             }
@@ -113,11 +109,7 @@ pipeline {
               changeset ".infrastructure/**"
               // build lần đầu một PR
               allOf {
-                not {
-                  anyOf {
-                    changeset ".infrastructure/**"
-                  }
-                }
+                not { changeset ".infrastructure/**" }
                 changelog ''
               }
             }
