@@ -56,7 +56,7 @@ pipeline {
             }
             anyOf {
               changeset ".infrastructure/**"
-              // build lần đầu một PR
+              // build lần đầu một PR 
               allOf {
                 not { changeset ".infrastructure/**" }
                 changelog ''
