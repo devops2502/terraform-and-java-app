@@ -34,15 +34,23 @@ pipeline {
     stage('Build') {
       when {
         anyOf {
-          // Build cho nhánh chính
+          // Build cho nhánh chính (khi merge)
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
-          // Build cho nhánh feature
+          // Build khi push trực tiếp lên feature/*
+          allOf {
+            not { changeRequest() }
+            expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
+          }
+          // Build cho PR từ feature/*, develop, staging vào develop, staging, main
           allOf {
             changeRequest()
-            expression { env.CHANGE_BRANCH ==~ /^feature\/.*/ }
+            expression {
+              (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
+              (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
+              (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
+            }
           }
-
-          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
+          // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
           allOf {
             changeRequest()
             expression {
@@ -51,16 +59,15 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
-              // build lần đầu một PR
-              allOf {
-                not {
-                  anyOf {
-                    changeset "src/**"
-                    changeset "**/pom.xml"
-                  }
-                }
-                changelog ''
-              }
+              // allOf {
+              //   not {
+              //     anyOf {
+              //       changeset "src/**"
+              //       changeset "**/pom.xml"
+              //     }
+              //   }
+              //   changelog ''
+              // }
             }
           }
         }
@@ -73,15 +80,23 @@ pipeline {
     stage('Test') {
       when {
         anyOf {
-          // Build cho nhánh chính
+          // Build cho nhánh chính (khi merge)
           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
-          // Build cho nhánh feature
+          // Build khi push trực tiếp lên feature/*
+          allOf {
+            not { changeRequest() }
+            expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
+          }
+          // Build cho PR từ feature/*, develop, staging vào develop, staging, main
           allOf {
             changeRequest()
-            expression { env.CHANGE_BRANCH ==~ /^feature\/.*/ }
+            expression {
+              (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
+              (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
+              (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
+            }
           }
-
-          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
+          // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
           allOf {
             changeRequest()
             expression {
@@ -90,16 +105,15 @@ pipeline {
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
-              // build lần đầu một PR
-              allOf {
-                not {
-                  anyOf {
-                    changeset "src/**"
-                    changeset "**/pom.xml"
-                  }
-                }
-                changelog ''
-              }
+              // allOf {
+              //   not {
+              //     anyOf {
+              //       changeset "src/**"
+              //       changeset "**/pom.xml"
+              //     }
+              //   }
+              //   changelog ''
+              // }
             }
           }
         }
@@ -162,3 +176,4 @@ pipeline {
 }
 
 // changeset trong Jenkins chỉ gồm những thay đổi từ lúc PR mở trở đi
+// changeset chỉ có tác dụng bên trong 1 stage ko có tác dụng kiểm soát trigger pipeline
