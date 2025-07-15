@@ -42,19 +42,21 @@ pipeline {
             expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
           }
           // Build cho PR từ feature/*, develop, staging vào develop, staging, main
+          // allOf {
+          //   changeRequest()
+          //   expression {
+          //     (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
+          //     (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
+          //     (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
+          //   }
+          // }
+          // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
           allOf {
             changeRequest()
             expression {
               (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
               (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
               (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
-            }
-          }
-          // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
-          allOf {
-            changeRequest()
-            expression {
-              return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET)
             }
             anyOf {
               changeset "src/**"
@@ -88,19 +90,21 @@ pipeline {
             expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
           }
           // Build cho PR từ feature/*, develop, staging vào develop, staging, main
+          // allOf {
+          //   changeRequest()
+          //   expression {
+          //     (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
+          //     (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
+          //     (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
+          //   }
+          // }
+          // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
           allOf {
             changeRequest()
             expression {
               (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
               (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
               (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
-            }
-          }
-          // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
-          allOf {
-            changeRequest()
-            expression {
-              return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET)
             }
             anyOf {
               changeset "src/**"
