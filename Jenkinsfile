@@ -38,10 +38,10 @@ pipeline {
           allOf {
             not { changeRequest() }
             expression { env.BRANCH_NAME ==~ /^feature\/.*/ || ['develop', 'staging', 'main', /^feature\/.*/].contains(env.BRANCH_NAME) }
-            // anyOf {
-            //   changeset "src/**"
-            //   changeset "**/pom.xml"
-            // } 
+            anyOf {
+              changeset "src/**"
+              changeset "**/pom.xml"
+            } 
           }
           // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
           allOf {
@@ -77,22 +77,15 @@ pipeline {
     stage('Test') {
       when {
         anyOf {
-          // Build cho nhánh chính (khi merge)
-          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
-          // Build khi push trực tiếp lên feature/*
+          // Build khi push trực tiếp lên feature/* hoặc merge vào develop, staging, main
           allOf {
             not { changeRequest() }
-            expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
+            expression { env.BRANCH_NAME ==~ /^feature\/.*/ || ['develop', 'staging', 'main', /^feature\/.*/].contains(env.BRANCH_NAME) }
+            anyOf {
+              changeset "src/**"
+              changeset "**/pom.xml"
+            } 
           }
-          // Build cho PR từ feature/*, develop, staging vào develop, staging, main
-          // allOf {
-          //   changeRequest()
-          //   expression {
-          //     (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
-          //     (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
-          //     (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
-          //   }
-          // }
           // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
           allOf {
             changeRequest()
@@ -102,17 +95,19 @@ pipeline {
               (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
             }
             anyOf {
+              // Cho push lên lại vào PR
               changeset "src/**"
               changeset "**/pom.xml"
-              // allOf {
-              //   not {
-              //     anyOf {
-              //       changeset "src/**"
-              //       changeset "**/pom.xml"
-              //     }
-              //   }
-              //   changelog ''
-              // }
+              // Cho tạo PR lần đầu
+              allOf {
+                not {
+                  anyOf {
+                    changeset "src/**"
+                    changeset "**/pom.xml"
+                  }
+                }
+                expression { currentBuild.changeSets.size() == 0 }
+              }
             }
           }
         }
@@ -176,4 +171,3 @@ pipeline {
 
 // changeset trong Jenkins chỉ gồm những thay đổi từ lúc PR mở trở đi
 // changeset chỉ có tác dụng bên trong 1 stage ko có tác dụng kiểm soát trigger pipeline
-// sử dụng path filtering trong Jenkins UI để ngăn chặn trigger cả pipeline
