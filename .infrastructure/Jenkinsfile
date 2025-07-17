@@ -9,6 +9,8 @@ pipeline {
     terraform 'terraform50708'
   }
 
+  options { skipDefaultCheckout() }
+
   stages {
     stage('Checkout Code') {
       steps {
@@ -61,7 +63,7 @@ pipeline {
             anyOf {
               // push lại lên PR cũ
               changeset ".infrastructure/**"
-              // build lần đầu một PR 
+              // build lần đầu một PR (tạo PR nhưng changeset chưa detect được thay đổi)
               allOf {
                 not { changeset ".infrastructure/**" }
                 expression { currentBuild.changeSets.size() == 0 }
@@ -115,7 +117,7 @@ pipeline {
             anyOf {
               // push lại lên PR cũ
               changeset ".infrastructure/**"
-              // build lần đầu một PR 
+              // build lần đầu một PR (tạo PR nhưng changeset chưa detect được thay đổi)
               allOf {
                 not { changeset ".infrastructure/**" }
                 expression { currentBuild.changeSets.size() == 0 }

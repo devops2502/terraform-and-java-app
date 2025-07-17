@@ -1,6 +1,8 @@
 pipeline {
   agent { label 'AGENT-01' }
 
+  options { skipDefaultCheckout() }
+  
   stages {
     stage('Checkout') {
       steps {
@@ -55,7 +57,7 @@ pipeline {
               // Cho push lên lại vào PR
               changeset "src/**"
               changeset "**/pom.xml"
-              // Cho tạo PR lần đầu
+              // Cho tạo PR lần đầu (tạo PR nhưng changeset chưa detect được thay đổi)
               allOf {
                 not {
                   anyOf {
@@ -98,7 +100,7 @@ pipeline {
               // Cho push lên lại vào PR
               changeset "src/**"
               changeset "**/pom.xml"
-              // Cho tạo PR lần đầu
+              // Cho tạo PR lần đầu (tạo PR nhưng changeset chưa detect được thay đổi)
               allOf {
                 not {
                   anyOf {
