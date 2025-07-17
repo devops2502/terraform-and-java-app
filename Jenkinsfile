@@ -34,26 +34,15 @@ pipeline {
     stage('Build') {
       when {
         anyOf {
-          // Build cho nhánh chính (khi merge)
-          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
-          // Build khi push trực tiếp lên feature/*
+          // Build khi push trực tiếp lên feature/* hoặc merge vào develop, staging, main
           allOf {
             not { changeRequest() }
-            expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
+            expression { return ['develop', 'staging', 'main', /^feature\/.*/].contains(env.BRANCH_NAME) }
             // anyOf {
             //   changeset "src/**"
             //   changeset "**/pom.xml"
             // } 
           }
-          // Build cho PR từ feature/*, develop, staging vào develop, staging, main
-          // allOf {
-          //   changeRequest()
-          //   expression {
-          //     (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
-          //     (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
-          //     (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
-          //   }
-          // }
           // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
           allOf {
             changeRequest()
@@ -79,17 +68,7 @@ pipeline {
         }
       }
       steps {
-        script {
-          try {
-            timeout(time: 10, unit: 'SECONDS') {
-              input message: "Xác nhận deploy lên PROD?"
-              sh './mvnw -B -DskipTests clean package'
-            }
-          } catch(e) {
-            echo "Destroy bị từ chối hoặc hết thời gian"
-          }
-        }
-        
+        sh './mvnw -B -DskipTests clean package'
       }
     }
 
@@ -179,9 +158,9 @@ pipeline {
             case 'main':
               timeout(time: 1, unit: 'HOURS') {
                 input message: "Xác nhận deploy lên PROD?"
+                echo "Deploying to PROD"
+                // sh './scripts/deploy-prod.sh'
               }
-              echo "Deploying to PROD"
-              // sh './scripts/deploy-prod.sh'
               break
 
             default:

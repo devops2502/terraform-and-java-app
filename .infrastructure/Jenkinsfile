@@ -196,7 +196,7 @@
 //                   input message: "Xác nhận destroy IaC?"
 //                 }
 //                 sh 'terraform destroy --auto-approve'
-//               } catch () {
+//               } catch (e) {
 //                 echo "Destroy bị từ chối hoặc hết thời gian"
 //               }
 //             }
