@@ -37,7 +37,7 @@ pipeline {
           // Build khi push trực tiếp lên feature/* hoặc merge vào develop, staging, main
           allOf {
             not { changeRequest() }
-            expression { return ['develop', 'staging', 'main', /^feature\/.*/].contains(env.BRANCH_NAME) }
+            expression { env.BRANCH_NAME ==~ /^feature\/.*/ || ['develop', 'staging', 'main', /^feature\/.*/].contains(env.BRANCH_NAME) }
             // anyOf {
             //   changeset "src/**"
             //   changeset "**/pom.xml"
