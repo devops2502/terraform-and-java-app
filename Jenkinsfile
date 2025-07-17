@@ -40,6 +40,10 @@ pipeline {
           allOf {
             not { changeRequest() }
             expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
+            anyOf {
+              changeset "src/**"
+              changeset "**/pom.xml"
+            } 
           }
           // Build cho PR từ feature/*, develop, staging vào develop, staging, main
           // allOf {
@@ -75,7 +79,17 @@ pipeline {
         }
       }
       steps {
-        sh './mvnw -B -DskipTests clean package'
+        script {
+          try {
+            timeout(time: 1, unit: 'HOURS') {
+              input message: "Xác nhận deploy lên PROD?"
+            }
+            sh './mvnw -B -DskipTests clean package'
+          } catch() {
+            echo "Destroy bị từ chối hoặc hết thời gian"
+          }
+        }
+        
       }
     }
 

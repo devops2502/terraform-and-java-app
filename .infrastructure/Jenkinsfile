@@ -46,21 +46,26 @@
 //           // Build cho nhánh chính
 //           expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
 //           // Build cho nhánh feature
-//           expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
+//           allOf {
+//             not { changeRequest() }
+//             expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
+//           }
 
 //           // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
 //           allOf {
 //             changeRequest()
 //             expression {
-//               return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET)
+//               (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
+//               (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
+//               (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
 //             }
 //             anyOf {
 //               changeset ".infrastructure/**"
 //               // build lần đầu một PR 
-//               allOf {
-//                 not { changeset ".infrastructure/**" }
-//                 expression { currentBuild.changeSets.size() == 0 }
-//               }
+//               // allOf {
+//               //   not { changeset ".infrastructure/**" }
+//               //   expression { currentBuild.changeSets.size() == 0 }
+//               // }
 //             }
 //           }
 //         }
@@ -185,10 +190,17 @@
 //               passwordVariable: 'AWS_SECRET_ACCESS_KEY'
 //             )
 //           ]) {
-//             timeout(time: 1, unit: 'HOURS') {
-//               input message: "Xác nhận destroy IaC?"
+//             script {
+//               try {
+//                 timeout(time: 1, unit: 'HOURS') {
+//                   input message: "Xác nhận destroy IaC?"
+//                 }
+//                 sh 'terraform destroy --auto-approve'
+//               } catch () {
+//                 echo "Destroy bị từ chối hoặc hết thời gian"
+//               }
 //             }
-//             sh 'terraform destroy --auto-approve'
+            
 //           }
 //         }
 //       }
