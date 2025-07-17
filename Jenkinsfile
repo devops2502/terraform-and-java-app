@@ -169,5 +169,6 @@ pipeline {
   }
 }
 
-// changeset trong Jenkins chỉ gồm những thay đổi từ lúc PR mở trở đi
+// changeset là thay đổi so với lần commit trước 
+// changeset trong Jenkins chỉ gồm những thay đổi từ lúc PR mở trở đi (nếu bắt đầu tạo PR)
 // changeset chỉ có tác dụng bên trong 1 stage ko có tác dụng kiểm soát trigger pipeline
