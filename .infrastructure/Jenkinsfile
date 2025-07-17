@@ -48,7 +48,7 @@ pipeline {
           // Build khi push trực tiếp lên feature/* hoặc merge vào develop, staging, main
           allOf {
             not { changeRequest() }
-            expression { env.BRANCH_NAME ==~ /^feature\/.*/ || ['develop', 'staging', 'main', /^feature\/.*/].contains(env.BRANCH_NAME) }
+            expression { env.BRANCH_NAME ==~ /^feature\/.*/ || ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
             changeset ".infrastructure/**"
           }
 
@@ -102,7 +102,7 @@ pipeline {
           // Build khi push trực tiếp lên feature/* hoặc merge vào develop, staging, main
           allOf {
             not { changeRequest() }
-            expression { env.BRANCH_NAME ==~ /^feature\/.*/ || ['develop', 'staging', 'main', /^feature\/.*/].contains(env.BRANCH_NAME) }
+            expression { env.BRANCH_NAME ==~ /^feature\/.*/ || ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
             changeset ".infrastructure/**"
           }
 
