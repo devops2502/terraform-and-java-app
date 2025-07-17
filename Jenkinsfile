@@ -52,17 +52,19 @@ pipeline {
               (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
             }
             anyOf {
+              // Cho push lên lại vào PR
               changeset "src/**"
               changeset "**/pom.xml"
-              // allOf {
-              //   not {
-              //     anyOf {
-              //       changeset "src/**"
-              //       changeset "**/pom.xml"
-              //     }
-              //   }
-              //   changelog ''
-              // }
+              // Cho tạo PR lần đầu
+              allOf {
+                not {
+                  anyOf {
+                    changeset "src/**"
+                    changeset "**/pom.xml"
+                  }
+                }
+                expression { currentBuild.changeSets.size() == 0 }
+              }
             }
           }
         }
