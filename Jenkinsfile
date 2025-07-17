@@ -80,14 +80,18 @@ pipeline {
       }
       steps {
         script {
-          try {
-            timeout(time: 1, unit: 'HOURS') {
+          // try {
+          //   timeout(time: 1, unit: 'HOURS') {
+          //     input message: "Xác nhận deploy lên PROD?"
+          //     sh './mvnw -B -DskipTests clean package'
+          //   }
+          // } catch(e) {
+          //   echo "Destroy bị từ chối hoặc hết thời gian"
+          // }
+          timeout(time: 1, unit: 'HOURS') {
               input message: "Xác nhận deploy lên PROD?"
-            sh './mvnw -B -DskipTests clean package'
+              sh './mvnw -B -DskipTests clean package'
             }
-          } catch(e) {
-            echo "Destroy bị từ chối hoặc hết thời gian"
-          }
         }
         
       }
