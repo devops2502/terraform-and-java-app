@@ -121,22 +121,22 @@ module "ec2_jenkins_agent" {
   })
 }
 
-module "test_1" {
-  source = "./modules/ec2"
+# module "test_1" {
+#   source = "./modules/ec2"
 
-  ec2_name               = "test"
-  ami                    = "ami-01f23391a59163da9"
-  instance_type          = "t2.micro"
-  key_name               = module.kp.key_name
-  ec2_monitoring         = var.ec2_monitoring
-  vpc_security_group_ids = [module.sg.sg_id]
-  subnet_id              = module.network.public_subnets[1]
-  create_eip             = false
+#   ec2_name               = "test"
+#   ami                    = "ami-01f23391a59163da9"
+#   instance_type          = "t2.micro"
+#   key_name               = module.kp.key_name
+#   ec2_monitoring         = var.ec2_monitoring
+#   vpc_security_group_ids = [module.sg.sg_id]
+#   subnet_id              = module.network.public_subnets[1]
+#   create_eip             = false
 
-  tags = merge(local.tags, {
-    Name = "${local.prefix_name}-test"
-  })
-}
+#   tags = merge(local.tags, {
+#     Name = "${local.prefix_name}-test"
+#   })
+# }
 
 # module "s3_bucket" {
 #   source = "./modules/s3_bucket"
