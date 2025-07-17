@@ -1,6 +1,8 @@
 pipeline {
   agent { label 'AGENT-01' }
 
+  options { skipDefaultCheckout() }
+  
   stages {
     stage('Checkout') {
       steps {
@@ -34,21 +36,28 @@ pipeline {
     stage('Build') {
       when {
         anyOf {
-          // Build cho nhánh chính
-          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
-          // Build cho nhánh feature
-          expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
-
-          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
+          // Build khi push trực tiếp lên feature/* hoặc merge vào develop, staging, main
           allOf {
-            changeRequest()
-            expression {
-              return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET)
-            }
+            not { changeRequest() }
+            expression { env.BRANCH_NAME ==~ /^feature\/.*/ || ['develop', 'staging', 'main', /^feature\/.*/].contains(env.BRANCH_NAME) }
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
-              // build lần đầu một PR
+            } 
+          }
+          // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
+          allOf {
+            changeRequest()
+            expression {
+              (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
+              (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
+              (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
+            }
+            anyOf {
+              // Cho push lên lại vào PR
+              changeset "src/**"
+              changeset "**/pom.xml"
+              // Cho tạo PR lần đầu (tạo PR nhưng changeset chưa detect được thay đổi)
               allOf {
                 not {
                   anyOf {
@@ -56,7 +65,7 @@ pipeline {
                     changeset "**/pom.xml"
                   }
                 }
-                changelog ''
+                expression { currentBuild.changeSets.size() == 0 }
               }
             }
           }
@@ -70,21 +79,28 @@ pipeline {
     stage('Test') {
       when {
         anyOf {
-          // Build cho nhánh chính
-          expression { return ['develop', 'staging', 'main'].contains(env.BRANCH_NAME) }
-          // Build cho nhánh feature
-          expression { env.BRANCH_NAME ==~ /^feature\/.*/ }
-
-          // Build cho PR từ feature/* nếu có thay đổi hoặc changelog rỗng (build đầu tiên khi tạo PR lần đầu)
+          // Build khi push trực tiếp lên feature/* hoặc merge vào develop, staging, main
           allOf {
-            changeRequest()
-            expression {
-              return ['develop', 'staging', 'main'].contains(env.CHANGE_TARGET)
-            }
+            not { changeRequest() }
+            expression { env.BRANCH_NAME ==~ /^feature\/.*/ || ['develop', 'staging', 'main', /^feature\/.*/].contains(env.BRANCH_NAME) }
             anyOf {
               changeset "src/**"
               changeset "**/pom.xml"
-              // build lần đầu một PR
+            } 
+          }
+          // Build lần đầu PR hoặc có thay đổi src/**, pom.xml
+          allOf {
+            changeRequest()
+            expression {
+              (env.CHANGE_BRANCH ==~ /^feature\/.*/ && env.CHANGE_TARGET == 'develop') ||
+              (env.CHANGE_BRANCH == 'develop' && env.CHANGE_TARGET == 'staging') ||
+              (env.CHANGE_BRANCH == 'staging' && env.CHANGE_TARGET == 'main')
+            }
+            anyOf {
+              // Cho push lên lại vào PR
+              changeset "src/**"
+              changeset "**/pom.xml"
+              // Cho tạo PR lần đầu (tạo PR nhưng changeset chưa detect được thay đổi)
               allOf {
                 not {
                   anyOf {
@@ -92,7 +108,7 @@ pipeline {
                     changeset "**/pom.xml"
                   }
                 }
-                changelog ''
+                expression { currentBuild.changeSets.size() == 0 }
               }
             }
           }
@@ -141,9 +157,9 @@ pipeline {
             case 'main':
               timeout(time: 1, unit: 'HOURS') {
                 input message: "Xác nhận deploy lên PROD?"
+                echo "Deploying to PROD"
+                // sh './scripts/deploy-prod.sh'
               }
-              echo "Deploying to PROD"
-              // sh './scripts/deploy-prod.sh'
               break
 
             default:
@@ -155,4 +171,6 @@ pipeline {
   }
 }
 
-// changeset trong Jenkins chỉ gồm những thay đổi từ lúc PR mở trở đi
+// changeset là thay đổi so với lần commit trước 
+// changeset trong Jenkins chỉ gồm những thay đổi từ lúc PR mở trở đi (nếu bắt đầu tạo PR)
+// changeset chỉ có tác dụng bên trong 1 stage ko có tác dụng kiểm soát trigger pipeline
